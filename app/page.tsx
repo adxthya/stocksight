@@ -1,103 +1,178 @@
+// app/page.tsx
+"use client";
+
+import { useState } from "react";
+import { Search } from "lucide-react";
 import Image from "next/image";
 
-export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+type StockData =
+  | {
+      symbol: string;
+      price: string;
+      change: string;
+      changePercent: string;
+    }
+  | { error: string }
+  | null;
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+export default function Home() {
+  const [query, setQuery] = useState("");
+  const [stockData, setStockData] = useState<StockData>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    setLoading(true);
+    setStockData(null);
+
+    try {
+      const res = await fetch(
+        `/api/stock?symbol=${query.trim().toUpperCase()}`
+      );
+      const data = await res.json();
+
+      if (!data.error) {
+        setStockData({
+          symbol: data.symbol,
+          price: data.price,
+          change: data.change,
+          changePercent: data.changePercent,
+        });
+      } else {
+        setStockData({ error: data.error });
+      }
+    } catch {
+      setStockData({ error: "Something went wrong" });
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <main className="flex flex-col min-h-screen bg-gray-900 text-gray-100">
+      {/* Navbar */}
+      <header className="border-b border-gray-800 bg-gray-750">
+        <div className="max-w-7xl mx-auto flex justify-between items-center py-4 px-6">
+          <Image
+            src="/stocksight.png"
+            alt="logo"
+            width={100}
+            height={100}
+          />
+          <nav className="hidden md:flex gap-6 text-gray-400 font-medium">
+            <a
+              href="#"
+              className="hover:text-indigo-400 transition"
+            >
+              Home
+            </a>
+            <a
+              href="#"
+              className="hover:text-indigo-400 transition"
+            >
+              Markets
+            </a>
+            <a
+              href="#"
+              className="hover:text-indigo-400 transition"
+            >
+              About
+            </a>
+          </nav>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </header>
+
+      {/* Hero Section */}
+      <section className="flex-1 max-w-7xl mx-auto px-6 py-16 text-center">
+        <h2 className="text-4xl md:text-5xl font-medium tracking-tight">
+          Track & Analyze <span className="text-indigo-400">Stocks</span> in
+          Real-Time
+        </h2>
+        <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">
+          Stay ahead of the market with live data, insights, and analytics — all
+          in a clean and user-friendly dashboard.
+        </p>
+
+        {/* Search Bar */}
+        <div className="mt-8 flex justify-center">
+          <div className="flex w-full max-w-md border border-gray-700 bg-gray-800 rounded-full shadow-sm overflow-hidden">
+            <input
+              type="text"
+              placeholder="Enter stock symbol..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="flex-1 px-4 py-2 bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none"
+            />
+            <button
+              onClick={handleSearch}
+              className="px-4 bg-indigo-500 text-white hover:bg-indigo-600 transition flex items-center gap-2"
+            >
+              <Search size={18} />
+              Search
+            </button>
+          </div>
+        </div>
+
+        {/* Stock Data */}
+        <div className="mt-8">
+          {loading && <p className="text-gray-400">Loading...</p>}
+
+          {stockData && "error" in stockData && (
+            <p className="text-red-400">{stockData.error}</p>
+          )}
+
+          {stockData && "symbol" in stockData ? (
+            <div className="mt-8 flex justify-center">
+              <div className="bg-gray-800 border border-gray-700 rounded-2xl shadow-lg p-6 w-full max-w-sm transition hover:shadow-xl">
+                <div className="text-center">
+                  <p className="text-sm text-gray-400">Stock Symbol</p>
+                  <h3 className="text-2xl font-bold text-white">
+                    {stockData.symbol}
+                  </h3>
+                </div>
+
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-gray-400">Current Price</p>
+                  <p className="text-3xl font-semibold text-indigo-400">
+                    ${parseFloat(stockData.price).toFixed(2)}
+                  </p>
+                </div>
+
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-gray-400">Change</p>
+                  <span
+                    className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                      parseFloat(stockData.change) >= 0
+                        ? "bg-green-900/50 text-green-400"
+                        : "bg-red-900/50 text-red-400"
+                    }`}
+                  >
+                    {parseFloat(stockData.change) >= 0 ? "▲" : "▼"}{" "}
+                    {stockData.change} ({stockData.changePercent})
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            !loading && (
+              <div className="mt-8 flex justify-center">
+                <Image
+                  src="/stock-graph.jpg"
+                  alt="Stock graph placeholder"
+                  className="max-w-lg w-full rounded-xl shadow-lg border border-gray-700"
+                  width={1000}
+                  height={1000}
+                />
+              </div>
+            )
+          )}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-800 bg-gray-850 py-6 text-center text-gray-500 text-sm">
+        © {new Date().getFullYear()} StockSight. All rights reserved.
       </footer>
-    </div>
+    </main>
   );
 }
