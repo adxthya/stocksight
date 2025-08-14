@@ -121,7 +121,7 @@ export default function Home() {
             <p className="text-red-400">{stockData.error}</p>
           )}
 
-          {stockData && "symbol" in stockData ? (
+          {stockData && "symbol" in stockData && (
             <div className="mt-8 flex justify-center">
               <div className="bg-gray-800 border border-gray-700 rounded-2xl shadow-lg p-6 w-full max-w-sm transition hover:shadow-xl">
                 <div className="text-center">
@@ -153,18 +153,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          ) : (
-            !loading && (
-              <div className="mt-8 flex justify-center">
-                <Image
-                  src="/stock-graph.jpg"
-                  alt="Stock graph placeholder"
-                  className="max-w-lg w-full rounded-xl shadow-lg border border-gray-700"
-                  width={1000}
-                  height={1000}
-                />
-              </div>
-            )
           )}
         </div>
       </section>
