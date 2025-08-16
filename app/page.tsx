@@ -59,26 +59,6 @@ export default function Home() {
             width={100}
             height={100}
           />
-          <nav className="hidden md:flex gap-6 text-gray-400 font-medium">
-            <a
-              href="#"
-              className="hover:text-indigo-400 transition"
-            >
-              Home
-            </a>
-            <a
-              href="#"
-              className="hover:text-indigo-400 transition"
-            >
-              Markets
-            </a>
-            <a
-              href="#"
-              className="hover:text-indigo-400 transition"
-            >
-              About
-            </a>
-          </nav>
         </div>
       </header>
 
